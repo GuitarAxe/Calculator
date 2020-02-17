@@ -297,17 +297,14 @@ public class Main {
                 }else if (isMatched("[\\+\\-\\*/]", queue.peekFirst())) {
                     BigInteger bigTemp2 = BigInteger.ZERO;
                     bigTemp2 = bigTemp2.add(stack.pollLast());
+                    bigTemp = bigTemp.add(stack.pollLast());
                     if (isMatched("\\+", queue.peekFirst())) {
-                        bigTemp = bigTemp.add(stack.pollLast());
                         bigTemp = bigTemp.add(bigTemp2);
                     }else if (isMatched("-", queue.peekFirst())) {
-                        bigTemp = bigTemp.add(stack.pollLast());
                         bigTemp = bigTemp.subtract(bigTemp2);
                     }else if (isMatched("\\*", queue.peekFirst())) {
-                        bigTemp = bigTemp.add(stack.pollLast());
                         bigTemp = bigTemp.multiply(bigTemp2);
                     }else if (isMatched("/", queue.peekFirst())) {
-                        bigTemp = bigTemp.add(stack.pollLast());
                         bigTemp = bigTemp.divide(bigTemp2);
                     }
                     stack.offerLast(bigTemp);
@@ -357,7 +354,7 @@ public class Main {
             for (int i = 0; i < expression.length; i++) {
                 String str = expression[i];
 
-                //check if char is operator
+                //check if String is operator
                 if(precedence(str)>0){
                     while(!stack.isEmpty() && precedence(stack.peekLast())>=precedence(str)){
                         result.offerLast(stack.pollLast());
