@@ -10,9 +10,7 @@ public class Main {
     public static void main(String[] args) throws ArrayIndexOutOfBoundsException {
 
         Scanner scanner = new Scanner(System.in);
-
         boolean exit = false;
-
         Map<String, String> map = new HashMap<>();
 
         while (!exit) {
@@ -21,6 +19,7 @@ public class Main {
                 input = "";
             }
 
+            //Menu
             if (input.equals("/exit")) {
                 exit = true;
                 System.out.println("Bye!");
@@ -43,6 +42,7 @@ public class Main {
                 String num = input;
                 String[] numbers;
 
+                //Convert String to numbers and signs separated by single space, removing redundant pluses, then splitting to String array
                 num = replaceString("\\++", num, " + ");
                 num = replaceString("\\-", num, " - ");
                 num = replaceString("\\*", num, " * ");
@@ -51,9 +51,10 @@ public class Main {
                 num = replaceString("\\(", num, " ( ");
                 num = replaceString("\\)", num, " ) ");
                 num = replaceString(" +", num," ");
-
-                boolean isBig = false;
                 numbers = num.split(" ");
+
+                //Check for BigIntegers
+                boolean isBig = false;
                 for (String s : numbers) {
                     if (map.containsKey(s)) {
                         String[] temp = map.get(s).split("");
@@ -65,9 +66,11 @@ public class Main {
 
                 if (numbers != null) {
                     if (numbers.length == 3) {
+                        //Add variable to map
                         if ((isMatched("\\w+", numbers[0])) && (numbers[1].equals("=")) && isMatched("\\w+", numbers[2])) {
                             addVariable(numbers, map);
                         }else {
+                            //Preparing to calculate and calculating
                             numbers = removeRedundantOperators(numbers);
                             Deque<String> stringDeque = new ArrayDeque<>();
                             stringDeque = infixToPostFix(numbers);
@@ -92,6 +95,7 @@ public class Main {
         }
     }
 
+    //Check for matching Strings
     private static boolean isMatched(String regex, String input) {
         if (input == null) {
 //            System.out.println("Null: isMatched");
@@ -103,6 +107,7 @@ public class Main {
         }
     }
 
+    //Replacing matching Strings
     private static String replaceString(String regex, String input, String newString) {
         String replacedString = "";
         Pattern pattern = Pattern.compile(regex);
@@ -118,6 +123,7 @@ public class Main {
         for (int i = 0; i < numbers.length; i++) {
             if (!invalidExpression) {
                 if (numbersQueue.size() == 0) {
+                    //Check if input is one number and if its negative
                     if (isMatched("\\d+", numbers[i]) || isMatched("[a-zA-Z]+", numbers[i]) || isMatched("[\\(]", numbers[i])) {
                         if (firstMinus) {
                             numbers[i] = "-" + numbers[i];
@@ -133,6 +139,7 @@ public class Main {
                         invalidExpression = true;
                     }
                 }else {
+                    //Check for invalid input
                     if (isMatched("\\d+", numbers[i]) || isMatched("[a-zA-Z]+", numbers[i])) {
                         if (isMatched("\\d+", numbers[i - 1]) || isMatched("[a-zA-Z]+", numbers[i - 1])) {
                             System.out.println("Invalid expression");
@@ -148,7 +155,8 @@ public class Main {
                             }else {
                                 numbersQueue.offerLast(numbers[i]);
                             }
-                        }else if (isMatched("\\-", numbers[i])) {
+                        }//Removing redundant minuses
+                        else if (isMatched("\\-", numbers[i])) {
                             if (isMatched("[\\*/]", numbers[i - 1])) {
                                 System.out.println("Invalid expression");
                                 invalidExpression = true;
@@ -182,6 +190,7 @@ public class Main {
                 }
             }
         }
+        //If valid returning postfix notation
         int size = numbersQueue.size();
         String[] finalNumbers = new String[size];
         if (!invalidExpression) {
@@ -197,6 +206,7 @@ public class Main {
     public static boolean addVariable(String[] numbers, Map<String, String> map) {
         for (int i = 0; i < numbers.length; i++) {
             try {
+                //Check if uses adds valid variable
                 if ((isMatched("\\w+", numbers[i])) && (numbers[i + 1].equals("=")) && isMatched("\\w+", numbers[i + 2])) {
                     if (numbers.length == 3) {
                         if (isMatched("[a-zA-Z]+", numbers[i]) && isMatched("[a-zA-Z]+", numbers[i + 2])) {
@@ -236,10 +246,12 @@ public class Main {
         Deque<Integer> stack = new ArrayDeque<>();
         int result = 0;
         try {
+            //if there is only one number, print and return
             if (queue.size() == 1) {
                 System.out.println(queue.pollLast());
                 return 0;
             }
+            //Check for variables and changing from name to number
             while (!queue.isEmpty()) {
                 int temp = 0;
                 if (isMatched("[a-zA-Z]+", queue.peekFirst())) {
@@ -247,8 +259,10 @@ public class Main {
                         stack.offerLast(Integer.parseInt(map.get(queue.peekFirst())));
                         queue.pollFirst();
                     }
+                    //Add number to the stack
                 }else if (isMatched("\\d+", queue.peekFirst())) {
                     stack.offerLast(Integer.parseInt(queue.pollFirst()));
+                    //Make operation depending on the operator
                 }else if (isMatched("[\\+\\-\\*/]", queue.peekFirst())) {
                     int temp2 = stack.pollLast();
                     if (isMatched("\\+", queue.peekFirst())) {
@@ -279,10 +293,12 @@ public class Main {
         Deque<BigInteger> stack = new ArrayDeque<>();
         BigInteger result = BigInteger.ZERO;
         try {
+            //if there is only one number, print and return
             if (queue.size() == 1) {
                 System.out.println(queue.pollLast());
                 return BigInteger.ZERO;
             }
+            //Check for variables and changing from name to number
             while (!queue.isEmpty()) {
                 BigInteger bigTemp = BigInteger.ZERO;
                 if (isMatched("[a-zA-Z]+", queue.peekFirst())) {
@@ -291,9 +307,11 @@ public class Main {
                         stack.offerLast(bigTemp);
                         queue.pollFirst();
                     }
+                    //Add number to the stack
                 }else if (isMatched("\\d+", queue.peekFirst())) {
                     bigTemp = new BigInteger(queue.pollFirst());
                     stack.offerLast(bigTemp);
+                    //Make operation depending on the operator
                 }else if (isMatched("[\\+\\-\\*/]", queue.peekFirst())) {
                     BigInteger bigTemp2 = BigInteger.ZERO;
                     bigTemp2 = bigTemp2.add(stack.pollLast());
