@@ -190,7 +190,7 @@ public class Main {
                 }
             }
         }
-        //If valid returning postfix notation
+        //If valid returning valid notation ready to be converted to postifix
         int size = numbersQueue.size();
         String[] finalNumbers = new String[size];
         if (!invalidExpression) {
